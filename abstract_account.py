@@ -48,11 +48,19 @@ class AbstractAccount(ABC):
 
     @classmethod
     def _create_unique_id(cls, account_id: str | None) -> str:
-        new_id = account_id or str(uuid4())
-        if new_id in cls._used_ids:
-            raise ValueError(f"account id already exists: {new_id}")
-        cls._used_ids.add(new_id)
-        return new_id
+        provided = str(account_id).strip() if account_id is not None else ""
+        if provided:
+            if provided in cls._used_ids:
+                raise ValueError(f"account id already exists: {provided}")
+            cls._used_ids.add(provided)
+            return provided
+
+        for _ in range(32):
+            short_id = uuid4().hex[:8]
+            if short_id not in cls._used_ids:
+                cls._used_ids.add(short_id)
+                return short_id
+        raise RuntimeError("could not generate a unique short account id")
 
     @abstractmethod
     def deposit(self, amount: float) -> float:

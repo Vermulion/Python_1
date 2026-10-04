@@ -12,7 +12,16 @@ Shared base for every account type:
 - `status`: `active`, `frozen`, `closed`
 - abstract methods: `deposit`, `withdraw`, `get_account_info`
 
-You cannot create `AbstractAccount` directly. A later step will add a concrete class.
+## Step 2 — `BankAccount`
+
+Concrete account with extra rules:
+
+- validation of owner, amount, and currency
+- operations allowed only when status is `active`
+- `AccountFrozenError`, `AccountClosedError`, `InvalidOperationError`, `InsufficientFundsError`
+- `freeze` / `unfreeze` / `close`
+- short UUID (8 hex chars) if account number is empty
+- `currency`: `RUB`, `USD`, `EUR`, `KZT`, `CNY`
 
 ## Run the demo
 
@@ -23,5 +32,5 @@ python main.py
 ## Run tests
 
 ```bash
-python -m unittest test_abstract_account.py
+python -m unittest test_abstract_account.py test_bank_account.py
 ```

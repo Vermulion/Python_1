@@ -1,17 +1,34 @@
-"""Step 1 demo: AbstractAccount cannot be created directly."""
+"""Step 2 demo: BankAccount validation, status rules, and currency."""
 
-from abstract_account import AbstractAccount, Owner
+from abstract_account import Owner
+from bank_account import AccountClosedError, AccountFrozenError, BankAccount
 
 
 def main() -> None:
-    owner = Owner(full_name="Alice Smith", email="alice@example.com")
-    print(f"Owner ready: {owner.full_name}")
+    owner = Owner(
+        full_name="Alice Smith",
+        email="alice@example.com",
+        phone="+79991234567",
+    )
+    account = BankAccount(owner, opening_balance=100, currency="RUB")
+    print(account.get_account_info())
 
+    account.deposit(50)
+    account.withdraw(20)
+    print("After operations:", account.get_account_info())
+
+    account.freeze()
     try:
-        AbstractAccount(owner=owner, opening_balance=100)
-    except TypeError as error:
-        print("AbstractAccount is abstract, as expected:")
-        print(f"  {error}")
+        account.withdraw(10)
+    except AccountFrozenError as error:
+        print(f"Frozen account blocked withdraw: {error}")
+
+    account.unfreeze()
+    account.close()
+    try:
+        account.deposit(5)
+    except AccountClosedError as error:
+        print(f"Closed account blocked deposit: {error}")
 
 
 if __name__ == "__main__":
