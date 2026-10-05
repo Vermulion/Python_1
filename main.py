@@ -11,7 +11,7 @@ def main() -> None:
         phone="+79991234567",
     )
     account = BankAccount(owner, opening_balance=100, currency="RUB")
-    print(account.get_account_info())
+    print(account)
 
     account.deposit(50)
     account.withdraw(20)

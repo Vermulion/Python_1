@@ -11,6 +11,7 @@ Shared base for every account type:
 - protected `_balance`
 - `status`: `active`, `frozen`, `closed`
 - abstract methods: `deposit`, `withdraw`, `get_account_info`
+- base checks: sum correctness, account status, no negative values
 
 ## Step 2 — `BankAccount`
 
@@ -22,6 +23,7 @@ Concrete account with extra rules:
 - `freeze` / `unfreeze` / `close`
 - short UUID (8 hex chars) if account number is empty
 - `currency`: `RUB`, `USD`, `EUR`, `KZT`, `CNY`
+- `__str__`: account type, client, last 4 digits of the number, status, balance and currency
 
 ## Run the demo
 

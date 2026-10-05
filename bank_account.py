@@ -5,7 +5,29 @@ from __future__ import annotations
 import re
 from enum import Enum
 
-from abstract_account import AbstractAccount, AccountStatus, Owner
+from abstract_account import (
+    AbstractAccount,
+    AccountClosedError,
+    AccountFrozenError,
+    AccountStatus,
+    BankError,
+    InsufficientFundsError,
+    InvalidOperationError,
+    Owner,
+)
+
+__all__ = [
+    "AbstractAccount",
+    "AccountClosedError",
+    "AccountFrozenError",
+    "AccountStatus",
+    "BankAccount",
+    "BankError",
+    "Currency",
+    "InsufficientFundsError",
+    "InvalidOperationError",
+    "Owner",
+]
 
 
 class Currency(Enum):
@@ -14,26 +36,6 @@ class Currency(Enum):
     EUR = "EUR"
     KZT = "KZT"
     CNY = "CNY"
-
-
-class BankError(Exception):
-    """Base error for bank account operations."""
-
-
-class AccountFrozenError(BankError):
-    """Raised when the account is frozen and the operation is not allowed."""
-
-
-class AccountClosedError(BankError):
-    """Raised when the account is closed and the operation is not allowed."""
-
-
-class InvalidOperationError(BankError):
-    """Raised when the operation is invalid for the current data or status."""
-
-
-class InsufficientFundsError(BankError):
-    """Raised when a withdrawal exceeds the balance."""
 
 
 _EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -51,26 +53,15 @@ class BankAccount(AbstractAccount):
         currency: Currency | str = Currency.RUB,
     ) -> None:
         self._validate_owner(owner)
-        opening_balance = self._validate_money(opening_balance, allow_zero=True)
         currency = self._validate_currency(currency)
         super().__init__(owner, opening_balance, account_id)
         self.currency = currency
 
     def deposit(self, amount: float) -> float:
-        self._ensure_open_for("deposit")
-        money = self._validate_money(amount, allow_zero=False)
-        self._balance += money
-        return self._balance
+        return self._apply_credit(amount)
 
     def withdraw(self, amount: float) -> float:
-        self._ensure_open_for("withdraw")
-        money = self._validate_money(amount, allow_zero=False)
-        if money > self._balance:
-            raise InsufficientFundsError(
-                f"need {money} {self.currency.value}, but balance is {self._balance}"
-            )
-        self._balance -= money
-        return self._balance
+        return self._apply_debit(amount)
 
     def freeze(self) -> None:
         if self.status is AccountStatus.FROZEN:
@@ -102,11 +93,15 @@ class BankAccount(AbstractAccount):
             "status": self.status.value,
         }
 
-    def _ensure_open_for(self, operation: str) -> None:
-        if self.status is AccountStatus.FROZEN:
-            raise AccountFrozenError(f"cannot {operation}: account is frozen")
-        if self.status is AccountStatus.CLOSED:
-            raise AccountClosedError(f"cannot {operation}: account is closed")
+    def __str__(self) -> str:
+        last_four = self.account_id[-4:].rjust(4, "*")
+        return (
+            f"type: {type(self).__name__} | "
+            f"client: {self.owner.full_name} | "
+            f"number: ****{last_four} | "
+            f"status: {self.status.value} | "
+            f"balance: {self._balance:.2f} {self.currency.value}"
+        )
 
     @staticmethod
     def _validate_owner(owner: Owner) -> None:
@@ -116,16 +111,6 @@ class BankAccount(AbstractAccount):
             raise ValueError(f"invalid email: {owner.email}")
         if owner.phone and not _PHONE_PATTERN.match(owner.phone):
             raise ValueError(f"invalid phone: {owner.phone}")
-
-    @staticmethod
-    def _validate_money(value: object, allow_zero: bool) -> float:
-        if isinstance(value, bool) or not isinstance(value, (int, float)):
-            raise InvalidOperationError("amount must be a number")
-        if value != value or value in (float("inf"), float("-inf")):
-            raise InvalidOperationError("amount must be a finite number")
-        if value < 0 or (not allow_zero and value == 0):
-            raise InvalidOperationError("amount must be greater than 0")
-        return float(value)
 
     @staticmethod
     def _validate_currency(currency: Currency | str) -> Currency:

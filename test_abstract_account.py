@@ -1,18 +1,23 @@
 import unittest
 
-from abstract_account import AbstractAccount, AccountStatus, Owner
+from abstract_account import (
+    AbstractAccount,
+    AccountFrozenError,
+    AccountStatus,
+    InsufficientFundsError,
+    InvalidOperationError,
+    Owner,
+)
 
 
 class DummyAccount(AbstractAccount):
     """Minimal subclass so tests can create an account object."""
 
     def deposit(self, amount: float) -> float:
-        self._balance += amount
-        return self._balance
+        return self._apply_credit(amount)
 
     def withdraw(self, amount: float) -> float:
-        self._balance -= amount
-        return self._balance
+        return self._apply_debit(amount)
 
     def get_account_info(self) -> dict[str, object]:
         return {
@@ -57,8 +62,29 @@ class AbstractAccountTests(unittest.TestCase):
             Owner("  ")
 
     def test_negative_opening_balance_is_invalid(self) -> None:
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidOperationError):
             DummyAccount(Owner("Alice"), opening_balance=-1)
+
+    def test_sum_correctness(self) -> None:
+        account = DummyAccount(Owner("Alice"), opening_balance=10.1)
+        account.deposit(0.2)
+        self.assertEqual(account._balance, 10.3)
+        account.withdraw(0.3)
+        self.assertEqual(account._balance, 10.0)
+
+    def test_status_blocks_operations(self) -> None:
+        account = DummyAccount(Owner("Alice"), opening_balance=10)
+        account.status = AccountStatus.FROZEN
+        with self.assertRaises(AccountFrozenError):
+            account.deposit(1)
+
+    def test_negative_amount_is_rejected(self) -> None:
+        account = DummyAccount(Owner("Alice"), opening_balance=10)
+        with self.assertRaises(InvalidOperationError):
+            account.withdraw(-5)
+        with self.assertRaises(InsufficientFundsError):
+            account.withdraw(10.01)
+        self.assertEqual(account._balance, 10)
 
 
 if __name__ == "__main__":

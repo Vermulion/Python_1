@@ -55,6 +55,13 @@ class BankAccountTests(unittest.TestCase):
         account.withdraw(10)
         self.assertEqual(account._balance, 60.0)
 
+    def test_sum_stays_correct_with_cents(self) -> None:
+        account = BankAccount(self.owner, opening_balance=10.10, currency=Currency.RUB)
+        account.deposit(0.20)
+        self.assertEqual(account._balance, 10.30)
+        account.withdraw(0.05)
+        self.assertEqual(account._balance, 10.25)
+
     def test_cannot_withdraw_more_than_balance(self) -> None:
         account = BankAccount(self.owner, opening_balance=10)
         with self.assertRaises(InsufficientFundsError):
@@ -96,6 +103,21 @@ class BankAccountTests(unittest.TestCase):
             account.freeze()
         with self.assertRaises(AccountClosedError):
             account.close()
+
+    def test_str_shows_type_client_last_four_status_balance_currency(self) -> None:
+        account = BankAccount(
+            self.owner,
+            opening_balance=100,
+            account_id="ACC-1001",
+            currency=Currency.USD,
+        )
+        text = str(account)
+        self.assertIn("BankAccount", text)
+        self.assertIn("Alice Smith", text)
+        self.assertIn("****1001", text)
+        self.assertNotIn("ACC-", text)
+        self.assertIn("active", text)
+        self.assertIn("100.00 USD", text)
 
 
 if __name__ == "__main__":
