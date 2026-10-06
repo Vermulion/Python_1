@@ -10,8 +10,9 @@ Shared base for every account type:
 - `owner` data (`full_name`, `email`, `phone`)
 - protected `_balance`
 - `status`: `active`, `frozen`, `closed`
-- abstract methods: `deposit`, `withdraw`, `get_account_info`
-- base checks: sum correctness, account status, no negative values
+- abstract methods: `get_account_info`
+- shared money operations: `deposit`, `withdraw`
+- base checks: sum correctness, account status, no negative values, at most 2 decimal places
 
 ## Step 2 — `BankAccount`
 

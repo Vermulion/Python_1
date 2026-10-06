@@ -48,6 +48,13 @@ class BankAccountTests(unittest.TestCase):
             account.deposit(0)
         with self.assertRaises(InvalidOperationError):
             account.withdraw("10")  # type: ignore[arg-type]
+        with self.assertRaises(InvalidOperationError):
+            account.deposit(0.001)
+        with self.assertRaises(InvalidOperationError):
+            account.withdraw(0.001)
+        with self.assertRaises(InvalidOperationError):
+            account.deposit(10.123)
+        self.assertEqual(account._balance, 50)
 
     def test_deposit_and_withdraw_when_active(self) -> None:
         account = BankAccount(self.owner, opening_balance=50, currency=Currency.EUR)

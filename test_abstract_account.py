@@ -13,12 +13,6 @@ from abstract_account import (
 class DummyAccount(AbstractAccount):
     """Minimal subclass so tests can create an account object."""
 
-    def deposit(self, amount: float) -> float:
-        return self._apply_credit(amount)
-
-    def withdraw(self, amount: float) -> float:
-        return self._apply_debit(amount)
-
     def get_account_info(self) -> dict[str, object]:
         return {
             "account_id": self.account_id,
@@ -77,6 +71,16 @@ class AbstractAccountTests(unittest.TestCase):
         account.status = AccountStatus.FROZEN
         with self.assertRaises(AccountFrozenError):
             account.deposit(1)
+
+    def test_amount_below_one_cent_is_rejected(self) -> None:
+        account = DummyAccount(Owner("Alice"), opening_balance=10)
+        with self.assertRaises(InvalidOperationError):
+            account.deposit(0.001)
+        with self.assertRaises(InvalidOperationError):
+            account.withdraw(0.001)
+        with self.assertRaises(InvalidOperationError):
+            account.deposit(10.123)
+        self.assertEqual(account._balance, 10)
 
     def test_negative_amount_is_rejected(self) -> None:
         account = DummyAccount(Owner("Alice"), opening_balance=10)

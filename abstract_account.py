@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from decimal import Decimal
 from enum import Enum
 from uuid import uuid4
 
@@ -90,7 +91,11 @@ class AbstractAccount(ABC):
             raise InvalidOperationError("negative values are not allowed")
         if not allow_zero and amount == 0:
             raise InvalidOperationError("amount must be greater than 0")
-        return round(float(amount), 2)
+        money = Decimal(str(amount))
+        exponent = money.as_tuple().exponent
+        if isinstance(exponent, int) and exponent < -2:
+            raise InvalidOperationError("amount must have at most 2 decimal places")
+        return float(money.quantize(Decimal("0.01")))
 
     def _check_account_status(self, operation: str) -> None:
         """Money operations are allowed only on an active account."""
@@ -134,18 +139,18 @@ class AbstractAccount(ABC):
             raise InvalidOperationError("balance sum is incorrect")
         if result < 0:
             raise InvalidOperationError("balance cannot be negative")
-        if add and result < previous:
+        if add and result <= previous:
             raise InvalidOperationError("deposit must increase the balance")
-        if not add and result > previous:
+        if not add and result >= previous:
             raise InvalidOperationError("withdrawal must decrease the balance")
 
-    @abstractmethod
     def deposit(self, amount: float) -> float:
-        """Add money to the account. Subclasses define the rules."""
+        """Add money to the account."""
+        return self._apply_credit(amount)
 
-    @abstractmethod
     def withdraw(self, amount: float) -> float:
-        """Take money from the account. Subclasses define the rules."""
+        """Take money from the account."""
+        return self._apply_debit(amount)
 
     @abstractmethod
     def get_account_info(self) -> dict[str, object]:
