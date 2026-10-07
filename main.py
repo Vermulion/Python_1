@@ -1,7 +1,10 @@
-"""Step 2 demo: BankAccount validation, status rules, and currency."""
+"""Step 3 demo: BankAccount plus Savings / Premium / Investment types."""
 
 from abstract_account import Owner
 from bank_account import AccountFrozenError, BankAccount
+from investment_account import DEMO_GROWTH_RATES, InvestmentAccount
+from premium_account import PremiumAccount
+from savings_account import SavingsAccount
 
 
 def main() -> None:
@@ -52,6 +55,50 @@ def main() -> None:
     active_account.withdraw(20)
     print("  withdrew 20")
     print(f"  after:  {active_account.get_account_info()}")
+
+    savings = SavingsAccount(
+        Owner("Carol Lee", email="carol@example.com", phone="+79991112233"),
+        opening_balance=1000,
+        account_id="SAV-3003",
+        min_balance=100,
+        monthly_rate=0.01,
+    )
+    premium = PremiumAccount(
+        Owner("Dana Kim", email="dana@example.com", phone="+79994445566"),
+        opening_balance=500,
+        account_id="PREM-4004",
+        transaction_limit=1_000_000,
+        overdraft_limit=1_000,
+        fixed_fee=5,
+    )
+    investment = InvestmentAccount(
+        Owner("Evan Wu", email="evan@example.com", phone="+79997778899"),
+        opening_balance=800,
+        account_id="INV-5005",
+    )
+
+    print("\nExtra account types:")
+    print(" ", savings)
+    print(" ", premium)
+    print(" ", investment)
+    savings.apply_monthly_interest()
+    print("  savings after monthly interest:", savings.get_account_info())
+
+    print("\nPremium overdraft and fee:")
+    print(f"  before withdraw: {premium.get_account_info()}")
+    premium.withdraw(520)
+    print("  withdrew 520 (plus fixed fee 5)")
+    print(f"  after: {premium.get_account_info()}")
+    print(" ", premium)
+
+    print("\nInvestment portfolio:")
+    investment.invest("stocks", 300)
+    investment.invest("bonds", 200)
+    investment.invest("etf", 100)
+    print(" ", investment)
+    print("  info:", investment.get_account_info())
+    print("  demo rates:", DEMO_GROWTH_RATES)
+    print("  projected yearly growth:", investment.project_yearly_growth(DEMO_GROWTH_RATES))
 
 
 if __name__ == "__main__":

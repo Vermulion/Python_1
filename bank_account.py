@@ -57,12 +57,6 @@ class BankAccount(AbstractAccount):
         super().__init__(owner, opening_balance, account_id)
         self.currency = currency
 
-    def deposit(self, amount: float) -> float:
-        return self._apply_credit(amount)
-
-    def withdraw(self, amount: float) -> float:
-        return self._apply_debit(amount)
-
     def freeze(self) -> None:
         if self.status is AccountStatus.FROZEN:
             raise InvalidOperationError("account is already frozen")
