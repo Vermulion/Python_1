@@ -26,6 +26,12 @@ Concrete account with extra rules:
 - `currency`: `RUB`, `USD`, `EUR`, `KZT`, `CNY`
 - `__str__`: account type, client, last 4 digits of the number, status, balance and currency
 
+## Step 3 — extra account types
+
+- `SavingsAccount`: `min_balance`, `monthly_rate`, `apply_monthly_interest`; withdrawals cannot go below `min_balance`
+- `PremiumAccount`: placeholder subclass of `BankAccount` (rules later)
+- `InvestmentAccount`: placeholder subclass of `BankAccount` (rules later)
+
 ## Run the demo
 
 ```bash
@@ -35,5 +41,5 @@ python main.py
 ## Run tests
 
 ```bash
-python -m unittest test_abstract_account.py test_bank_account.py
+python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py
 ```
