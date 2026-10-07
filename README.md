@@ -29,8 +29,10 @@ Concrete account with extra rules:
 ## Step 3 — extra account types
 
 - `SavingsAccount`: `min_balance`, `monthly_rate`, `apply_monthly_interest`; withdrawals cannot go below `min_balance`
-- `PremiumAccount`: placeholder subclass of `BankAccount` (rules later)
-- `InvestmentAccount`: placeholder subclass of `BankAccount` (rules later)
+- `PremiumAccount`: increased `transaction_limit`, `overdraft_limit` (balance may go negative), `fixed_fee` charged on each withdrawal
+- `InvestmentAccount`: portfolio split among `stocks`, `bonds`, `etf`; `invest(type, amount)`; `withdraw` takes cash only (portfolio is not withdrawable); `project_yearly_growth(growth_rates)` with a dict of type → annual rate (demo: stocks 10%, bonds 4%, etf 7%)
+- validation: active account, positive amount, enough funds, known security type
+- every account type overrides `__str__()`
 
 ## Run the demo
 
@@ -41,5 +43,5 @@ python main.py
 ## Run tests
 
 ```bash
-python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py
+python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py test_premium_account.py test_investment_account.py
 ```

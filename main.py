@@ -2,7 +2,7 @@
 
 from abstract_account import Owner
 from bank_account import AccountFrozenError, BankAccount
-from investment_account import InvestmentAccount
+from investment_account import DEMO_GROWTH_RATES, InvestmentAccount
 from premium_account import PremiumAccount
 from savings_account import SavingsAccount
 
@@ -67,6 +67,9 @@ def main() -> None:
         Owner("Dana Kim", email="dana@example.com", phone="+79994445566"),
         opening_balance=500,
         account_id="PREM-4004",
+        transaction_limit=1_000_000,
+        overdraft_limit=1_000,
+        fixed_fee=5,
     )
     investment = InvestmentAccount(
         Owner("Evan Wu", email="evan@example.com", phone="+79997778899"),
@@ -80,6 +83,22 @@ def main() -> None:
     print(" ", investment)
     savings.apply_monthly_interest()
     print("  savings after monthly interest:", savings.get_account_info())
+
+    print("\nPremium overdraft and fee:")
+    print(f"  before withdraw: {premium.get_account_info()}")
+    premium.withdraw(520)
+    print("  withdrew 520 (plus fixed fee 5)")
+    print(f"  after: {premium.get_account_info()}")
+    print(" ", premium)
+
+    print("\nInvestment portfolio:")
+    investment.invest("stocks", 300)
+    investment.invest("bonds", 200)
+    investment.invest("etf", 100)
+    print(" ", investment)
+    print("  info:", investment.get_account_info())
+    print("  demo rates:", DEMO_GROWTH_RATES)
+    print("  projected yearly growth:", investment.project_yearly_growth(DEMO_GROWTH_RATES))
 
 
 if __name__ == "__main__":
