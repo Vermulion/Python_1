@@ -65,6 +65,10 @@ class AbstractAccount(ABC):
         self._balance = opening_balance
         self.status = AccountStatus.ACTIVE
 
+    @property
+    def balance(self) -> float:
+        return self._balance
+
     @classmethod
     def _create_unique_id(cls, account_id: str | None) -> str:
         provided = str(account_id).strip() if account_id is not None else ""
