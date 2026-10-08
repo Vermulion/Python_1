@@ -34,6 +34,34 @@ Concrete account with extra rules:
 - validation: active account, positive amount, enough funds, known security type
 - every account type overrides `__str__()`
 
+## Step 4 — `Client` and `Bank`
+
+`Client`:
+
+- first name, middle name, surname, unique id, status (`active` / `blocked` / `closed`)
+- contacts: phones, email, address
+- list of accounts
+- age verification: must be 18 or older
+
+`Bank`:
+
+- `add_client()`, `authenticate_client(client_id, email)`
+- `open_account()`, `close_account()`, `freeze_account()`, `unfreeze_account()`
+- `search_accounts()` by account id, client, status, and/or type
+
+## Step 5 — protection, totals, ranking
+
+Protection:
+
+- 3 failed authentications block the client (`auth_locked` tag)
+- suspicious actions are tagged on the client and logged on the bank (`failed_auth`, `auth_locked`, `night_operation`, `unknown_client`)
+- bank operations (`open` / `close` / `freeze` / `unfreeze`) are prohibited from 00:00 until 05:00
+
+Additional:
+
+- `get_total_balance()` — client or whole bank, converted via FX rates to RUB (or another currency)
+- `get_clients_ranking()` — clients ordered by converted total, richest first
+
 ## Run the demo
 
 ```bash
@@ -43,5 +71,5 @@ python main.py
 ## Run tests
 
 ```bash
-python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py test_premium_account.py test_investment_account.py
+python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py test_premium_account.py test_investment_account.py test_client.py test_bank.py test_bank_scenario.py
 ```
