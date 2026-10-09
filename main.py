@@ -9,6 +9,7 @@ from client import Client, Contacts
 from investment_account import DEMO_GROWTH_RATES, InvestmentAccount
 from premium_account import PremiumAccount
 from savings_account import SavingsAccount
+from transaction import Transaction, TransactionProcessor, TransactionQueue
 
 
 def main() -> None:
@@ -193,6 +194,39 @@ def main() -> None:
     print("  frozen:", bank.search_accounts(status="frozen"))
     bank.unfreeze_account("DANA-USD")
     print("  after unfreeze:", bank.search_accounts(account_id="DANA-USD")[0].status.value)
+
+    print("\nTransactions, queue, and processor:")
+    queue = TransactionQueue()
+    processor = TransactionProcessor(bank, queue, outer_fee_rate=0.01, clock=lambda: datetime(2026, 6, 15, 12, 0))
+    specs = [
+        ("T1", "DANA-RUB", "EVAN-EUR", 100, "RUB", "internal", 10),
+        ("T2", "DANA-USD", "DANA-RUB", 10, "USD", "internal", 9),
+        ("T3", "EVAN-EUR", "DANA-RUB", 5, "EUR", "internal", 8),
+        ("T4", "DANA-RUB", "SWIFT-1", 50, "RUB", "external", 7),
+        ("T5", "DANA-USD", "EVAN-EUR", 20, "USD", "internal", 6),
+        ("T6", "EVAN-EUR", "DANA-RUB", 100, "EUR", "internal", 5),
+        ("T7", "DANA-RUB", "EVAN-EUR", 10, "RUB", "internal", 4),
+        ("T8", "DANA-USD", "DANA-RUB", 200, "USD", "internal", 3),
+        ("T9", "DANA-RUB", "EVAN-EUR", 15, "RUB", "internal", 2),
+        ("T10", "EVAN-EUR", "DANA-RUB", 1, "EUR", "internal", 1),
+    ]
+    for tx_id, sender, receiver, amount, currency, tx_type, priority in specs:
+        queue.add(
+            Transaction(
+                sender_id=sender,
+                receiver_id=receiver,
+                amount=amount,
+                currency=currency,
+                tx_type=tx_type,
+                transaction_id=tx_id,
+                priority=priority,
+            )
+        )
+    print("  pending:", [tx.transaction_id for tx in queue.pending_transactions()])
+    results = processor.process_all()
+    for tx in results:
+        print(" ", tx)
+    print("  error log entries:", len(processor.error_log))
 
 
 
