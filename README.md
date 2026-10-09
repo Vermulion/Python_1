@@ -62,6 +62,25 @@ Additional:
 - `get_total_balance()` — client or whole bank, converted via FX rates to RUB (or another currency)
 - `get_clients_ranking()` — clients ordered by converted total, richest first
 
+## Step 6 — transactions
+
+`Transaction`:
+
+- id, type (`internal` / `external`), amount, currency, transfer fee
+- sender, receiver
+- status, rejection reason, timestamps
+
+`TransactionQueue`:
+
+- add to queue, priority, pending list, cancellation
+
+`TransactionProcessor`:
+
+- outer-transfer fees, currency conversion, retries, error log
+- no negative balance except premium overdraft
+- no transfers from or to frozen accounts
+- fee on outer (external) transactions
+
 ## Run the demo
 
 ```bash
@@ -71,5 +90,5 @@ python main.py
 ## Run tests
 
 ```bash
-python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py test_premium_account.py test_investment_account.py test_client.py test_bank.py test_bank_scenario.py
+python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py test_premium_account.py test_investment_account.py test_client.py test_bank.py test_bank_scenario.py test_transaction.py
 ```
