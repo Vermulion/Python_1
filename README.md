@@ -81,6 +81,26 @@ Additional:
 - no transfers from or to frozen accounts
 - fee on outer (external) transactions
 
+## Step 7 — audit log and risk analyzer
+
+`AuditLog`:
+
+- importance levels: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+- in-memory storage, save/load JSON-lines file, optional auto-save
+- filtration by level, source, client, account, transaction, and time
+
+`RiskAnalyzer`:
+
+- flags large sums, frequent transfers, payments to new accounts, and night transfers (00:00–05:00)
+- risk levels: `low`, `middle`, `high`
+- the bank blocks `high` (dangerous) transactions before money moves
+
+Audit reports:
+
+- suspicious transactions
+- client risk profile
+- error statistics
+
 ## Run the demo
 
 ```bash
@@ -90,5 +110,5 @@ python main.py
 ## Run tests
 
 ```bash
-python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py test_premium_account.py test_investment_account.py test_client.py test_bank.py test_bank_scenario.py test_transaction.py
+python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py test_premium_account.py test_investment_account.py test_client.py test_bank.py test_bank_scenario.py test_transaction.py test_audit_log.py test_risk_analyzer.py
 ```

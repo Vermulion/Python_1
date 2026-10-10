@@ -228,6 +228,41 @@ def main() -> None:
         print(" ", tx)
     print("  error log entries:", len(processor.error_log))
 
+    print("\nAudit, risk analyzer, and blocked transfers:")
+    night = datetime(2026, 6, 15, 2, 0)
+    risk_queue = TransactionQueue()
+    risk_processor = TransactionProcessor(
+        bank,
+        risk_queue,
+        outer_fee_rate=0.01,
+        clock=lambda: night,
+        audit_log=processor.audit_log,
+        risk_analyzer=processor.risk_analyzer,
+    )
+    mixed = [
+        ("ORD-1", "DANA-RUB", "EVAN-EUR", 10, "RUB", "internal"),
+        ("SUS-1", "DANA-RUB", "OFFSHORE-9", 80_000, "RUB", "external"),
+        ("SUS-2", "DANA-USD", "GHOST-ACC", 1_000, "USD", "external"),
+    ]
+    for tx_id, sender, receiver, amount, currency, tx_type in mixed:
+        risk_queue.add(
+            Transaction(
+                sender_id=sender,
+                receiver_id=receiver,
+                amount=amount,
+                currency=currency,
+                tx_type=tx_type,
+                transaction_id=tx_id,
+                created_at=night,
+            )
+        )
+    for tx in risk_processor.process_all():
+        print(" ", tx)
+    print("  suspicious:", risk_processor.reporter.suspicious_transactions())
+    print("  dana profile:", risk_processor.reporter.client_risk_profile("CL-DANA"))
+    print("  error stats:", risk_processor.reporter.error_statistics())
+    print("  audit warnings+:", len(processor.audit_log.filter(min_level="WARNING")))
+
 
 
 if __name__ == "__main__":
