@@ -15,9 +15,16 @@ from abstract_account import (
     InsufficientFundsError,
     InvalidOperationError,
 )
+from audit_log import AuditLog, LogLevel
 from bank import Bank
 from bank_account import BankAccount, Currency
 from premium_account import PremiumAccount
+from risk_analyzer import (
+    AuditReporter,
+    DangerousTransactionError,
+    RiskAnalyzer,
+    RiskLevel,
+)
 from savings_account import SavingsAccount
 
 
@@ -209,7 +216,7 @@ class TransactionQueue:
         return len(self._items)
 
 class TransactionProcessor:
-    """Applies fees, FX conversion, retries, and transfer rules."""
+    """Applies fees, FX conversion, retries, transfer rules, and risk checks."""
 
     DEFAULT_OUTER_FEE_RATE = 0.01
     DEFAULT_MAX_RETRIES = 3
@@ -222,6 +229,8 @@ class TransactionProcessor:
         outer_fee_rate: float = DEFAULT_OUTER_FEE_RATE,
         max_retries: int = DEFAULT_MAX_RETRIES,
         clock: Callable[[], datetime] | None = None,
+        audit_log: AuditLog | None = None,
+        risk_analyzer: RiskAnalyzer | None = None,
     ) -> None:
         if not isinstance(bank, Bank):
             raise TypeError("bank must be a Bank instance")
@@ -235,6 +244,11 @@ class TransactionProcessor:
         self.max_retries = int(max_retries)
         self._clock = clock or datetime.now
         self.error_log: list[dict[str, object]] = []
+        self.audit_log = audit_log if audit_log is not None else AuditLog(clock=self._clock)
+        self.risk_analyzer = (
+            risk_analyzer if risk_analyzer is not None else RiskAnalyzer()
+        )
+        self.reporter = AuditReporter(self.audit_log, self.risk_analyzer, self)
 
     def process_all(self) -> list[Transaction]:
         results: list[Transaction] = []
@@ -257,8 +271,17 @@ class TransactionProcessor:
             transaction.attempts += 1
             transaction.mark(TransactionStatus.PROCESSING, at=self._clock())
             try:
+                self._screen(transaction)
                 self._apply(transaction)
+                self.risk_analyzer.remember(transaction)
                 transaction.mark(TransactionStatus.COMPLETED, at=self._clock())
+                self.audit_log.info(
+                    "transaction completed",
+                    source="processor",
+                    account_id=transaction.sender_id,
+                    transaction_id=transaction.transaction_id,
+                    extra={"receiver_id": transaction.receiver_id},
+                )
                 return transaction
             except (
                 AccountFrozenError,
@@ -283,6 +306,29 @@ class TransactionProcessor:
                     )
                     return transaction
         return transaction
+
+    def _screen(self, transaction: Transaction) -> None:
+        assessment = self.risk_analyzer.assess(
+            transaction, self.bank, at=self._clock()
+        )
+        level = LogLevel.INFO if assessment.level is RiskLevel.LOW else LogLevel.WARNING
+        if assessment.level is RiskLevel.HIGH:
+            level = LogLevel.CRITICAL
+        self.audit_log.log(
+            level,
+            f"risk {assessment.level.value}: {', '.join(assessment.signals) or 'none'}",
+            source="risk_analyzer",
+            client_id=assessment.client_id,
+            account_id=transaction.sender_id,
+            transaction_id=transaction.transaction_id,
+            extra={"signals": list(assessment.signals), "amount_rub": assessment.amount_rub},
+        )
+        if self.risk_analyzer.is_dangerous(assessment):
+            raise DangerousTransactionError(
+                "dangerous transaction blocked: "
+                f"{assessment.level.value} risk ({', '.join(assessment.signals)})"
+            )
+
 
     def _apply(self, transaction: Transaction) -> None:
         sender = self._require_account(transaction.sender_id, "sender")
@@ -380,6 +426,19 @@ class TransactionProcessor:
                 "detail": str(error),
                 "at": self._clock(),
             }
+        )
+        level = (
+            LogLevel.CRITICAL
+            if isinstance(error, DangerousTransactionError)
+            else LogLevel.ERROR
+        )
+        self.audit_log.log(
+            level,
+            str(error),
+            source="processor",
+            account_id=transaction.sender_id,
+            transaction_id=transaction.transaction_id,
+            extra={"error": type(error).__name__, "attempt": transaction.attempts},
         )
 
 
