@@ -107,6 +107,16 @@ Audit reports:
 python main.py
 ```
 
+`main.py` runs a full-system scenario (`bank_demo.py`):
+
+- 8 clients and 15 accounts (checking, savings, premium, investment; one frozen)
+- 40 queued transfers (day + night), one cancelled before execution
+- mixed FX, external fees, frozen/unknown/overdraft failures
+- risk screening: night, large-sum, and new-counterparty transfers; high risk is blocked
+- user cases: client accounts, payment history, suspicious list
+- reports: top-3 clients, transaction statistics, total bank balance
+- audit trail written to `demo_audit.jsonl`
+
 ## Run tests
 
 ```bash
