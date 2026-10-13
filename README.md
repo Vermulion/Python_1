@@ -2,6 +2,32 @@
 
 Built step by step.
 
+Python 3.11+ is enough for the bank, tests, and reports. Charts need **matplotlib**.
+
+## Setup
+
+Do **not** copy library folders into the project. Declare the extra package and install it into a virtual environment:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+On Linux/macOS use `source .venv/bin/activate` instead of `.venv\Scripts\activate`.
+
+`requirements.txt` lists only **matplotlib**. The rest of the project uses the standard library (`json`, `csv`, `unittest`, …). Do not commit `.venv/` or a full `pip freeze` of your global Python.
+
+After install:
+
+```bash
+python main.py
+python -m unittest test_report_builder.py
+```
+
+Demo files land in `demo_reports/` (TXT/JSON/CSV) and `demo_reports/charts/` (PNG). Those are generated output, not packages.
+
+
 ## Step 1 — `AbstractAccount`
 
 Shared base for every account type:
