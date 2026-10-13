@@ -101,6 +101,15 @@ Audit reports:
 - client risk profile
 - error statistics
 
+## Step 8 — reports and charts
+
+`ReportBuilder` turns bank, client, and risk data into files and plots:
+
+- reports: by client, by bank, by risks
+- formats: TXT, JSON, CSV via `export_to_txt()`, `export_to_json()`, `export_to_csv()`
+- charts (matplotlib): pie, bar, and a balance-movement graph via `save_charts()`
+- `export_all()` writes the three reports plus PNGs into one folder
+
 ## Run the demo
 
 ```bash
@@ -115,10 +124,11 @@ python main.py
 - risk screening: night, large-sum, and new-counterparty transfers; high risk is blocked
 - user cases: client accounts, payment history, suspicious list
 - reports: top-3 clients, transaction statistics, total bank balance
+- `ReportBuilder` writes TXT/JSON/CSV plus pie, bar, and balance charts under `demo_reports/`
 - audit trail written to `demo_audit.jsonl`
 
 ## Run tests
 
 ```bash
-python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py test_premium_account.py test_investment_account.py test_client.py test_bank.py test_bank_scenario.py test_transaction.py test_audit_log.py test_risk_analyzer.py
+python -m unittest test_abstract_account.py test_bank_account.py test_savings_account.py test_premium_account.py test_investment_account.py test_client.py test_bank.py test_bank_scenario.py test_transaction.py test_audit_log.py test_risk_analyzer.py test_report_builder.py
 ```

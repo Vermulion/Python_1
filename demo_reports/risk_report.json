@@ -1,0 +1,808 @@
+{
+  "kind": "risk",
+  "generated_at": "2026-06-15T12:00:00",
+  "by_level": {
+    "low": 31,
+    "middle": 3,
+    "high": 6
+  },
+  "by_signal": {
+    "large_sum": 6,
+    "new_account": 39,
+    "night_transaction": 8,
+    "frequent_transactions": 2
+  },
+  "assessments": [
+    {
+      "transaction_id": "N01",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "OFFSHORE-1",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 60000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N02",
+      "client_id": "CL-DANA",
+      "sender_id": "DANA-USD",
+      "receiver_id": "GHOST-ACC",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 72000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N03",
+      "client_id": "CL-HUGO",
+      "sender_id": "HUGO-EUR",
+      "receiver_id": "SHADOW-9",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 60000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N04",
+      "client_id": "CL-FAY",
+      "sender_id": "FAY-KZT",
+      "receiver_id": "NEW-KZT",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 54000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N05",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-USD",
+      "receiver_id": "OFFSHORE-2",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 63000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N06",
+      "client_id": "CL-CAROL",
+      "sender_id": "CAROL-CNY",
+      "receiver_id": "NEW-CNY",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 52500.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N07",
+      "client_id": "CL-DANA",
+      "sender_id": "DANA-RUB",
+      "receiver_id": "BOB-RUB",
+      "risk_level": "middle",
+      "signals": [
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 100.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N08",
+      "client_id": "CL-GINA",
+      "sender_id": "GINA-RUB",
+      "receiver_id": "NEW-GINA",
+      "risk_level": "middle",
+      "signals": [
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 20.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "D01",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "BOB-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 500.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D02",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "CAROL-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 300.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D03",
+      "client_id": "CL-BOB",
+      "sender_id": "BOB-RUB",
+      "receiver_id": "GINA-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 200.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D04",
+      "client_id": "CL-DANA",
+      "sender_id": "DANA-RUB",
+      "receiver_id": "EVAN-EUR",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 1000.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D05",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-USD",
+      "receiver_id": "DANA-USD",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 4500.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D06",
+      "client_id": "CL-HUGO",
+      "sender_id": "HUGO-EUR",
+      "receiver_id": "BOB-EUR",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 2000.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D07",
+      "client_id": "CL-FAY",
+      "sender_id": "FAY-KZT",
+      "receiver_id": "GINA-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 1800.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D08",
+      "client_id": "CL-CAROL",
+      "sender_id": "CAROL-CNY",
+      "receiver_id": "FAY-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 2500.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D09",
+      "client_id": "CL-GINA",
+      "sender_id": "GINA-SAV",
+      "receiver_id": "GINA-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 150.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D10",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "SWIFT-EU",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 800.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D11",
+      "client_id": "CL-BOB",
+      "sender_id": "BOB-RUB",
+      "receiver_id": "ALICE-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 120.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D12",
+      "client_id": "CL-DANA",
+      "sender_id": "DANA-USD",
+      "receiver_id": "ALICE-USD",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 1350.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D13",
+      "client_id": "CL-CAROL",
+      "sender_id": "CAROL-RUB",
+      "receiver_id": "BOB-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 250.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D14",
+      "client_id": "CL-HUGO",
+      "sender_id": "HUGO-EUR",
+      "receiver_id": "EVAN-EUR",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 3000.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D15",
+      "client_id": "CL-FAY",
+      "sender_id": "FAY-RUB",
+      "receiver_id": "DANA-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 400.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D16",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "GINA-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 90.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D17",
+      "client_id": "CL-BOB",
+      "sender_id": "BOB-EUR",
+      "receiver_id": "HUGO-EUR",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 500.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D18",
+      "client_id": "CL-DANA",
+      "sender_id": "DANA-RUB",
+      "receiver_id": "CAROL-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 220.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D19",
+      "client_id": "CL-GINA",
+      "sender_id": "GINA-RUB",
+      "receiver_id": "FAY-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 80.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D20",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-USD",
+      "receiver_id": "SWIFT-US",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 2250.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D21",
+      "client_id": "CL-CAROL",
+      "sender_id": "CAROL-RUB",
+      "receiver_id": "GINA-SAV",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 60.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D22",
+      "client_id": "CL-HUGO",
+      "sender_id": "HUGO-EUR",
+      "receiver_id": "DANA-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 1000.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D23",
+      "client_id": "CL-FAY",
+      "sender_id": "FAY-KZT",
+      "receiver_id": "BOB-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 900.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D24",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "FAY-RUB",
+      "risk_level": "middle",
+      "signals": [
+        "frequent_transactions",
+        "new_account"
+      ],
+      "amount_rub": 70.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D25",
+      "client_id": "CL-BOB",
+      "sender_id": "BOB-RUB",
+      "receiver_id": "DANA-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 40.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D26",
+      "client_id": "CL-GINA",
+      "sender_id": "GINA-HOLD",
+      "receiver_id": "ALICE-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 50.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D27",
+      "client_id": "CL-EVAN",
+      "sender_id": "EVAN-EUR",
+      "receiver_id": "ALICE-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 20000.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D28",
+      "client_id": "CL-CAROL",
+      "sender_id": "CAROL-RUB",
+      "receiver_id": "MISSING-ACC",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 10.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D29",
+      "client_id": "CL-GINA",
+      "sender_id": "GINA-SAV",
+      "receiver_id": "ALICE-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 1950.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D30",
+      "client_id": "CL-DANA",
+      "sender_id": "DANA-USD",
+      "receiver_id": "BOB-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 7200.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D31",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "BOB-RUB",
+      "risk_level": "low",
+      "signals": [
+        "frequent_transactions"
+      ],
+      "amount_rub": 45.0,
+      "at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D32",
+      "client_id": "CL-FAY",
+      "sender_id": "FAY-RUB",
+      "receiver_id": "GINA-RUB",
+      "risk_level": "low",
+      "signals": [
+        "new_account"
+      ],
+      "amount_rub": 55.0,
+      "at": "2026-06-15T12:00:00"
+    }
+  ],
+  "suspicious": [
+    {
+      "transaction_id": "N01",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "OFFSHORE-1",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 60000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N02",
+      "client_id": "CL-DANA",
+      "sender_id": "DANA-USD",
+      "receiver_id": "GHOST-ACC",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 72000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N03",
+      "client_id": "CL-HUGO",
+      "sender_id": "HUGO-EUR",
+      "receiver_id": "SHADOW-9",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 60000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N04",
+      "client_id": "CL-FAY",
+      "sender_id": "FAY-KZT",
+      "receiver_id": "NEW-KZT",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 54000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N05",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-USD",
+      "receiver_id": "OFFSHORE-2",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 63000.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N06",
+      "client_id": "CL-CAROL",
+      "sender_id": "CAROL-CNY",
+      "receiver_id": "NEW-CNY",
+      "risk_level": "high",
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 52500.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N07",
+      "client_id": "CL-DANA",
+      "sender_id": "DANA-RUB",
+      "receiver_id": "BOB-RUB",
+      "risk_level": "middle",
+      "signals": [
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 100.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N08",
+      "client_id": "CL-GINA",
+      "sender_id": "GINA-RUB",
+      "receiver_id": "NEW-GINA",
+      "risk_level": "middle",
+      "signals": [
+        "new_account",
+        "night_transaction"
+      ],
+      "amount_rub": 20.0,
+      "at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "D24",
+      "client_id": "CL-ALICE",
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "FAY-RUB",
+      "risk_level": "middle",
+      "signals": [
+        "frequent_transactions",
+        "new_account"
+      ],
+      "amount_rub": 70.0,
+      "at": "2026-06-15T12:00:00"
+    }
+  ],
+  "client_profiles": [
+    {
+      "client_id": "CL-ALICE",
+      "risk_level": "high",
+      "transaction_count": 10,
+      "by_level": {
+        "low": 7,
+        "middle": 1,
+        "high": 2
+      },
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction",
+        "frequent_transactions"
+      ],
+      "suspicious_transactions": [
+        "N01",
+        "N05",
+        "D24"
+      ],
+      "tags": []
+    },
+    {
+      "client_id": "CL-BOB",
+      "risk_level": "low",
+      "transaction_count": 4,
+      "by_level": {
+        "low": 4,
+        "middle": 0,
+        "high": 0
+      },
+      "signals": [
+        "new_account"
+      ],
+      "suspicious_transactions": [],
+      "tags": []
+    },
+    {
+      "client_id": "CL-CAROL",
+      "risk_level": "high",
+      "transaction_count": 5,
+      "by_level": {
+        "low": 4,
+        "middle": 0,
+        "high": 1
+      },
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "suspicious_transactions": [
+        "N06"
+      ],
+      "tags": []
+    },
+    {
+      "client_id": "CL-DANA",
+      "risk_level": "high",
+      "transaction_count": 6,
+      "by_level": {
+        "low": 4,
+        "middle": 1,
+        "high": 1
+      },
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "suspicious_transactions": [
+        "N02",
+        "N07"
+      ],
+      "tags": []
+    },
+    {
+      "client_id": "CL-EVAN",
+      "risk_level": "low",
+      "transaction_count": 1,
+      "by_level": {
+        "low": 1,
+        "middle": 0,
+        "high": 0
+      },
+      "signals": [
+        "new_account"
+      ],
+      "suspicious_transactions": [],
+      "tags": []
+    },
+    {
+      "client_id": "CL-FAY",
+      "risk_level": "high",
+      "transaction_count": 5,
+      "by_level": {
+        "low": 4,
+        "middle": 0,
+        "high": 1
+      },
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "suspicious_transactions": [
+        "N04"
+      ],
+      "tags": []
+    },
+    {
+      "client_id": "CL-GINA",
+      "risk_level": "middle",
+      "transaction_count": 5,
+      "by_level": {
+        "low": 4,
+        "middle": 1,
+        "high": 0
+      },
+      "signals": [
+        "new_account",
+        "night_transaction"
+      ],
+      "suspicious_transactions": [
+        "N08"
+      ],
+      "tags": []
+    },
+    {
+      "client_id": "CL-HUGO",
+      "risk_level": "high",
+      "transaction_count": 4,
+      "by_level": {
+        "low": 3,
+        "middle": 0,
+        "high": 1
+      },
+      "signals": [
+        "large_sum",
+        "new_account",
+        "night_transaction"
+      ],
+      "suspicious_transactions": [
+        "N03"
+      ],
+      "tags": []
+    }
+  ],
+  "error_statistics": {
+    "total": 10,
+    "by_error": {
+      "DangerousTransactionError": 6,
+      "AccountFrozenError": 1,
+      "InsufficientFundsError": 2,
+      "InvalidOperationError": 1
+    },
+    "by_transaction": {
+      "N01": 1,
+      "N02": 1,
+      "N03": 1,
+      "N04": 1,
+      "N05": 1,
+      "N06": 1,
+      "D26": 1,
+      "D27": 1,
+      "D28": 1,
+      "D29": 1
+    },
+    "audit_error_count": 16
+  }
+}
