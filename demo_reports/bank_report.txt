@@ -1,0 +1,24 @@
+BANK REPORT
+========================================================================
+kind: bank
+generated_at: 2026-06-15T12:00:00
+bank_name: Northern Demo Bank
+clients: 8
+total_balance_rub: 889899.3
+transaction_statistics:
+  total: 41
+  by_status: {'completed': 30, 'rejected': 10, 'cancelled': 1}
+  by_type: {'internal': 32, 'external': 9}
+  completed_volume: 19935.0
+  completed_fees: 8.45
+
+details:
+  client_id | full_name | status | total_balance | currency | accounts | tags
+  CL-HUGO | Hugo Park | active | 294500.0 | RUB | 1 | []
+  CL-ALICE | Alice Marie Smith | active | 252884.5 | RUB | 2 | []
+  CL-DANA | Dana Kim | active | 171070.0 | RUB | 2 | []
+  CL-CAROL | Carol Ann Lee | active | 66210.0 | RUB | 2 | []
+  CL-FAY | Fay Chen | active | 45495.0 | RUB | 2 | []
+  CL-BOB | Bob Jones | active | 38135.0 | RUB | 2 | []
+  CL-EVAN | Evan Wu | active | 12000.0 | RUB | 1 | []
+  CL-GINA | Gina Rossi | active | 9604.8 | RUB | 3 | []

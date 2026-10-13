@@ -7,6 +7,7 @@ from datetime import datetime
 
 from bank import Bank
 from client import Client, Contacts
+from report_builder import ReportBuilder
 from transaction import (
     Transaction,
     TransactionProcessor,
@@ -281,6 +282,37 @@ def run_demo() -> None:
     print(f"  bank total balance: {bank.get_total_balance()} RUB")
     print(f"  Alice total: {bank.get_total_balance('CL-ALICE')} RUB")
     print(f"  Dana total: {bank.get_total_balance('CL-DANA')} RUB")
+    builder = ReportBuilder(
+        bank,
+        processor,
+        transactions=results + [cancelled],
+        output_dir="demo_reports",
+    )
+    alice_report = builder.client_report("CL-ALICE")
+    paths = {
+        "alice_json": builder.export_to_json(
+            "demo_reports/client_alice.json", alice_report
+        ),
+        "alice_csv": builder.export_to_csv(
+            "demo_reports/client_alice.csv", alice_report
+        ),
+        "bank_json": builder.export_to_json("demo_reports/bank_report.json"),
+        "bank_csv": builder.export_to_csv("demo_reports/bank_report.csv"),
+        "bank_txt": builder.export_to_txt("demo_reports/bank_report.txt"),
+        "risk_json": builder.export_to_json(
+            "demo_reports/risk_report.json", builder.risk_report()
+        ),
+        "risk_csv": builder.export_to_csv(
+            "demo_reports/risk_report.csv", builder.risk_report()
+        ),
+    }
+    charts = builder.save_charts("demo_reports/charts")
+    print("  exported reports:")
+    for name, path in paths.items():
+        print(f"    {name}: {path}")
+    print("  charts:")
+    for name, path in charts.items():
+        print(f"    {name}: {path}")
 
 
 if __name__ == "__main__":

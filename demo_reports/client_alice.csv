@@ -1,0 +1,17 @@
+transaction_id,type,status,amount,currency,fee,sender_id,receiver_id,reason,created_at,processed_at
+D01,internal,completed,500.0,RUB,0.0,ALICE-RUB,BOB-RUB,,2026-06-15T12:00:00,2026-06-15T12:00:00
+D02,internal,completed,300.0,RUB,0.0,ALICE-RUB,CAROL-RUB,,2026-06-15T12:00:00,2026-06-15T12:00:00
+D05,internal,completed,50.0,USD,0.0,ALICE-USD,DANA-USD,,2026-06-15T12:00:00,2026-06-15T12:00:00
+D10,external,completed,800.0,RUB,8.0,ALICE-RUB,SWIFT-EU,,2026-06-15T12:00:00,2026-06-15T12:00:00
+D11,internal,completed,120.0,RUB,0.0,BOB-RUB,ALICE-RUB,,2026-06-15T12:00:00,2026-06-15T12:00:00
+D12,internal,completed,15.0,USD,0.0,DANA-USD,ALICE-USD,,2026-06-15T12:00:00,2026-06-15T12:00:00
+D16,internal,completed,90.0,RUB,0.0,ALICE-RUB,GINA-RUB,,2026-06-15T12:00:00,2026-06-15T12:00:00
+D20,external,completed,25.0,USD,0.25,ALICE-USD,SWIFT-US,,2026-06-15T12:00:00,2026-06-15T12:00:00
+D24,internal,completed,70.0,RUB,0.0,ALICE-RUB,FAY-RUB,,2026-06-15T12:00:00,2026-06-15T12:00:00
+D26,internal,rejected,50.0,RUB,0.0,GINA-HOLD,ALICE-RUB,transactions from frozen accounts are prohibited,2026-06-15T12:00:00,2026-06-15T12:00:00
+D27,internal,rejected,200.0,EUR,0.0,EVAN-EUR,ALICE-RUB,"need 200.0, but balance 120.0 cannot go below min_balance 5.0",2026-06-15T12:00:00,2026-06-15T12:00:00
+D29,internal,rejected,1950.0,RUB,0.0,GINA-SAV,ALICE-RUB,"need 1950.0, but balance 1910.0 cannot go below min_balance 100.0",2026-06-15T12:00:00,2026-06-15T12:00:00
+D31,internal,completed,45.0,RUB,0.0,ALICE-RUB,BOB-RUB,,2026-06-15T12:00:00,2026-06-15T12:00:00
+CXL1,internal,cancelled,10.0,RUB,0.0,ALICE-RUB,BOB-RUB,cancelled by client,2026-06-15T12:00:00,2026-06-15T12:00:00
+N01,external,rejected,60000.0,RUB,0.0,ALICE-RUB,OFFSHORE-1,"dangerous transaction blocked: high risk (large_sum, new_account, night_transaction)",2026-06-16T02:00:00,2026-06-16T02:00:00
+N05,external,rejected,700.0,USD,0.0,ALICE-USD,OFFSHORE-2,"dangerous transaction blocked: high risk (large_sum, new_account, night_transaction)",2026-06-16T02:00:00,2026-06-16T02:00:00

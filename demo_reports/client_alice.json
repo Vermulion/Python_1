@@ -1,0 +1,259 @@
+{
+  "kind": "client",
+  "generated_at": "2026-06-15T12:00:00",
+  "client_id": "CL-ALICE",
+  "full_name": "Alice Marie Smith",
+  "status": "active",
+  "tags": [],
+  "total_balance_rub": 252884.5,
+  "accounts": [
+    {
+      "account_id": "ALICE-RUB",
+      "type": "BankAccount",
+      "status": "active",
+      "balance": 78307.0,
+      "currency": "RUB",
+      "portfolio": {}
+    },
+    {
+      "account_id": "ALICE-USD",
+      "type": "PremiumAccount",
+      "status": "active",
+      "balance": 1939.75,
+      "currency": "USD",
+      "portfolio": {}
+    }
+  ],
+  "transactions": [
+    {
+      "transaction_id": "D01",
+      "type": "internal",
+      "status": "completed",
+      "amount": 500.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "BOB-RUB",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D02",
+      "type": "internal",
+      "status": "completed",
+      "amount": 300.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "CAROL-RUB",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D05",
+      "type": "internal",
+      "status": "completed",
+      "amount": 50.0,
+      "currency": "USD",
+      "fee": 0.0,
+      "sender_id": "ALICE-USD",
+      "receiver_id": "DANA-USD",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D10",
+      "type": "external",
+      "status": "completed",
+      "amount": 800.0,
+      "currency": "RUB",
+      "fee": 8.0,
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "SWIFT-EU",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D11",
+      "type": "internal",
+      "status": "completed",
+      "amount": 120.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "BOB-RUB",
+      "receiver_id": "ALICE-RUB",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D12",
+      "type": "internal",
+      "status": "completed",
+      "amount": 15.0,
+      "currency": "USD",
+      "fee": 0.0,
+      "sender_id": "DANA-USD",
+      "receiver_id": "ALICE-USD",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D16",
+      "type": "internal",
+      "status": "completed",
+      "amount": 90.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "GINA-RUB",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D20",
+      "type": "external",
+      "status": "completed",
+      "amount": 25.0,
+      "currency": "USD",
+      "fee": 0.25,
+      "sender_id": "ALICE-USD",
+      "receiver_id": "SWIFT-US",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D24",
+      "type": "internal",
+      "status": "completed",
+      "amount": 70.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "FAY-RUB",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D26",
+      "type": "internal",
+      "status": "rejected",
+      "amount": 50.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "GINA-HOLD",
+      "receiver_id": "ALICE-RUB",
+      "reason": "transactions from frozen accounts are prohibited",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D27",
+      "type": "internal",
+      "status": "rejected",
+      "amount": 200.0,
+      "currency": "EUR",
+      "fee": 0.0,
+      "sender_id": "EVAN-EUR",
+      "receiver_id": "ALICE-RUB",
+      "reason": "need 200.0, but balance 120.0 cannot go below min_balance 5.0",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D29",
+      "type": "internal",
+      "status": "rejected",
+      "amount": 1950.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "GINA-SAV",
+      "receiver_id": "ALICE-RUB",
+      "reason": "need 1950.0, but balance 1910.0 cannot go below min_balance 100.0",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "D31",
+      "type": "internal",
+      "status": "completed",
+      "amount": 45.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "BOB-RUB",
+      "reason": "",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "CXL1",
+      "type": "internal",
+      "status": "cancelled",
+      "amount": 10.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "BOB-RUB",
+      "reason": "cancelled by client",
+      "created_at": "2026-06-15T12:00:00",
+      "processed_at": "2026-06-15T12:00:00"
+    },
+    {
+      "transaction_id": "N01",
+      "type": "external",
+      "status": "rejected",
+      "amount": 60000.0,
+      "currency": "RUB",
+      "fee": 0.0,
+      "sender_id": "ALICE-RUB",
+      "receiver_id": "OFFSHORE-1",
+      "reason": "dangerous transaction blocked: high risk (large_sum, new_account, night_transaction)",
+      "created_at": "2026-06-16T02:00:00",
+      "processed_at": "2026-06-16T02:00:00"
+    },
+    {
+      "transaction_id": "N05",
+      "type": "external",
+      "status": "rejected",
+      "amount": 700.0,
+      "currency": "USD",
+      "fee": 0.0,
+      "sender_id": "ALICE-USD",
+      "receiver_id": "OFFSHORE-2",
+      "reason": "dangerous transaction blocked: high risk (large_sum, new_account, night_transaction)",
+      "created_at": "2026-06-16T02:00:00",
+      "processed_at": "2026-06-16T02:00:00"
+    }
+  ],
+  "risk": {
+    "client_id": "CL-ALICE",
+    "risk_level": "high",
+    "transaction_count": 10,
+    "by_level": {
+      "low": 7,
+      "middle": 1,
+      "high": 2
+    },
+    "signals": [
+      "large_sum",
+      "new_account",
+      "night_transaction",
+      "frequent_transactions"
+    ],
+    "suspicious_transactions": [
+      "N01",
+      "N05",
+      "D24"
+    ],
+    "tags": []
+  }
+}
