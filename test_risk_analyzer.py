@@ -144,6 +144,33 @@ class RiskAnalyzerTests(unittest.TestCase):
         self.assertIn("dangerous transaction blocked", result.rejection_reason)
         self.assertEqual(self.bank._require_account("ALICE-RUB").balance, 200_000)
 
+    def test_small_night_transfer_is_forbidden_not_just_medium_risk(self) -> None:
+        night_processor = TransactionProcessor(
+            self.bank,
+            TransactionQueue(),
+            clock=lambda: self.night,
+            risk_analyzer=RiskAnalyzer(large_sum_rub=50_000),
+        )
+        tx = self._tx(
+            sender_id="ALICE-RUB",
+            receiver_id="BOB-RUB",
+            amount=20,
+            transaction_id="R-NIGHT-SMALL",
+            created_at=self.night,
+            execute_at=self.night,
+        )
+        assessment = night_processor.risk_analyzer.assess(
+            tx, self.bank, at=self.night
+        )
+        self.assertEqual(assessment.level, RiskLevel.MIDDLE)
+        self.assertIn(SIGNAL_NIGHT, assessment.signals)
+        result = night_processor.process(tx)
+        self.assertEqual(result.status, TransactionStatus.REJECTED)
+        self.assertIn("00:00 until 05:00", result.rejection_reason)
+        self.assertNotIn("dangerous transaction blocked", result.rejection_reason or "")
+        self.assertEqual(self.bank._require_account("ALICE-RUB").balance, 200_000)
+        self.assertEqual(self.bank._require_account("BOB-RUB").balance, 5_000)
+
     def test_ordinary_and_suspicious_set(self) -> None:
         analyzer = RiskAnalyzer(large_sum_rub=50_000, frequent_limit=4)
         processor = TransactionProcessor(

@@ -300,6 +300,7 @@ class TransactionProcessor:
             transaction.mark(TransactionStatus.PROCESSING, at=self._clock())
             try:
                 self._screen(transaction)
+                self._forbid_night_transfer(transaction)
                 self._apply(transaction)
                 self.risk_analyzer.remember(transaction)
                 transaction.mark(TransactionStatus.COMPLETED, at=self._clock())
@@ -357,6 +358,12 @@ class TransactionProcessor:
                 f"{assessment.level.value} risk ({', '.join(assessment.signals)})"
             )
 
+    def _forbid_night_transfer(self, transaction: Transaction) -> None:
+        self.bank._forbid_night_operations(
+            "transfer",
+            account_id=transaction.sender_id,
+            at=self._clock(),
+        )
 
     def _apply(self, transaction: Transaction) -> None:
         sender = self._require_account(transaction.sender_id, "sender")
@@ -393,12 +400,13 @@ class TransactionProcessor:
                 transaction.amount, transaction.currency, receiver.currency
             )
 
+        sender_balance_before = sender.balance
         self._debit(sender, total_debit)
         if receiver is not None:
             try:
                 self._credit(receiver, credit)
             except Exception:
-                self._credit(sender, total_debit)
+                self._restore_balance(sender, sender_balance_before)
                 raise
 
     def _forbid_frozen(self, account: BankAccount, direction: str) -> None:
@@ -408,7 +416,10 @@ class TransactionProcessor:
             )
 
     def _forbid_negative_balance(self, account: BankAccount, debit: float) -> None:
-        projected = round(account.balance - debit, 2)
+        charged = debit
+        if isinstance(account, PremiumAccount):
+            charged = round(debit + account.fixed_fee, 2)
+        projected = round(account.balance - charged, 2)
         if isinstance(account, SavingsAccount) and projected < account.min_balance:
             raise InsufficientFundsError(
                 f"need {debit}, but balance {account.balance} cannot go below "
@@ -417,7 +428,7 @@ class TransactionProcessor:
         if isinstance(account, PremiumAccount):
             if projected < -account.overdraft_limit:
                 raise InsufficientFundsError(
-                    f"need {debit}, but overdraft_limit is {account.overdraft_limit}"
+                    f"need {charged}, but overdraft_limit is {account.overdraft_limit}"
                 )
             return
         if projected < 0:
@@ -426,12 +437,14 @@ class TransactionProcessor:
             )
 
     def _debit(self, account: BankAccount, amount: float) -> None:
-        account._check_account_status("transfer")
-        money = account._protect_from_negative(amount, allow_zero=False)
-        account._balance = round(account.balance - money, 2)
+        account.withdraw(amount)
 
     def _credit(self, account: BankAccount, amount: float) -> None:
         account.deposit(amount)
+
+    def _restore_balance(self, account: BankAccount, previous: float) -> None:
+        """Put the sender back exactly as before the debit, bypassing deposit limits."""
+        account._balance = round(float(previous), 2)
 
     def _convert(self, amount: float, source: Currency, target: Currency) -> float:
         if source is target:

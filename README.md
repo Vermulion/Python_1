@@ -81,7 +81,7 @@ Protection:
 
 - 3 failed authentications block the client (`auth_locked` tag)
 - suspicious actions are tagged on the client and logged on the bank (`failed_auth`, `auth_locked`, `night_operation`, `unknown_client`)
-- bank operations (`open` / `close` / `freeze` / `unfreeze`) are prohibited from 00:00 until 05:00
+- bank operations (`open` / `close` / `freeze` / `unfreeze`) and transfers are prohibited from 00:00 until 05:00
 
 Additional:
 
@@ -106,6 +106,7 @@ Additional:
 - outer-transfer fees, currency conversion, retries, error log
 - no negative balance except premium overdraft
 - no transfers from or to frozen accounts
+- no transfers from 00:00 until 05:00 (night is not only a risk signal)
 - fee on outer (external) transactions
 
 ## Step 7 — audit log and risk analyzer
@@ -120,7 +121,7 @@ Additional:
 
 - flags large sums, frequent transfers, payments to new accounts, and night transfers (00:00–05:00)
 - risk levels: `low`, `middle`, `high`
-- the bank blocks `high` (dangerous) transactions before money moves
+- the bank blocks `high` (dangerous) transactions and all night transfers before money moves
 
 Audit reports:
 
