@@ -94,11 +94,12 @@ Additional:
 
 - id, type (`internal` / `external`), amount, currency, transfer fee
 - sender, receiver
-- status, rejection reason, timestamps
+- status, rejection reason, timestamps (`created_at` is a label; `execute_at` is the planned run time)
 
 `TransactionQueue`:
 
 - add to queue, priority, pending list, cancellation
+- `pop_next()` returns only due transfers; deferred ones stay queued until `execute_at`
 
 `TransactionProcessor`:
 

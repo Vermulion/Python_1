@@ -144,6 +144,74 @@ class TransactionTests(unittest.TestCase):
         )
         self.assertEqual(self.queue.pop_next().transaction_id, "HIGH")
 
+    def test_deferred_transactions_wait_for_execute_at(self) -> None:
+        later = datetime(2026, 6, 16, 2, 0)
+        due = self._tx(
+            sender_id="ALICE-RUB",
+            receiver_id="BOB-RUB",
+            amount=10,
+            transaction_id="DUE-NOW",
+            priority=1,
+            created_at=self.now,
+        )
+        deferred = self._tx(
+            sender_id="ALICE-RUB",
+            receiver_id="BOB-RUB",
+            amount=20,
+            transaction_id="DEFERRED",
+            priority=9,
+            created_at=self.now,
+            execute_at=later,
+        )
+        self.queue.add(due)
+        self.queue.add(deferred)
+        self.assertEqual(deferred.created_at, self.now)
+        self.assertEqual(deferred.execute_at, later)
+        self.assertFalse(deferred.is_due(self.now))
+        self.assertTrue(deferred.is_due(later))
+        self.assertEqual(
+            [tx.transaction_id for tx in self.queue.pending_transactions()],
+            ["DEFERRED", "DUE-NOW"],
+        )
+        self.assertEqual(self.queue.pop_next(at=self.now).transaction_id, "DUE-NOW")
+        self.assertIsNone(self.queue.pop_next(at=self.now))
+        self.assertEqual(self.queue.pop_next(at=later).transaction_id, "DEFERRED")
+        self.assertIsNone(self.queue.pop_next(at=later))
+
+    def test_process_all_skips_deferred_until_execute_at(self) -> None:
+        later = datetime(2026, 6, 16, 2, 0)
+        self.queue.add(
+            self._tx(
+                sender_id="ALICE-RUB",
+                receiver_id="BOB-RUB",
+                amount=10,
+                transaction_id="NOW-TX",
+                created_at=self.now,
+            )
+        )
+        self.queue.add(
+            self._tx(
+                sender_id="ALICE-RUB",
+                receiver_id="BOB-RUB",
+                amount=15,
+                transaction_id="LATER-TX",
+                created_at=self.now,
+                execute_at=later,
+            )
+        )
+        first = self.processor.process_all()
+        self.assertEqual([tx.transaction_id for tx in first], ["NOW-TX"])
+        self.assertEqual(first[0].status, TransactionStatus.COMPLETED)
+        self.assertEqual(
+            [tx.transaction_id for tx in self.queue.pending_transactions()],
+            ["LATER-TX"],
+        )
+        self.now = later
+        delayed = self.processor.process_all()
+        self.assertEqual([tx.transaction_id for tx in delayed], ["LATER-TX"])
+        self.assertEqual(delayed[0].status, TransactionStatus.COMPLETED)
+        self.assertEqual(self.queue.pending_transactions(), [])
+
     def test_internal_transfer_moves_money(self) -> None:
         tx = self._tx(
             sender_id="ALICE-RUB",

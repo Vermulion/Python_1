@@ -41,7 +41,9 @@ def _enqueue(
     specs: list[tuple],
     *,
     created_at: datetime,
+    execute_at: datetime | None = None,
 ) -> None:
+    planned = execute_at if execute_at is not None else created_at
     for tx_id, sender, receiver, amount, currency, tx_type, priority in specs:
         queue.add(
             Transaction(
@@ -53,6 +55,7 @@ def _enqueue(
                 transaction_id=tx_id,
                 priority=priority,
                 created_at=created_at,
+                execute_at=planned,
             )
         )
 
@@ -206,30 +209,24 @@ def run_demo() -> None:
     print("  frozen accounts:", [acc.account_id for acc in bank.search_accounts(status="frozen")])
 
     _section("2. Simulation: enqueue 41 transfers (day + night)")
-    _enqueue(queue, daytime_specs(), created_at=day)
+    _enqueue(queue, daytime_specs(), created_at=day, execute_at=day)
     cancelled = queue.cancel("CXL1", at=day)
     print(f"  cancelled before run: {cancelled.transaction_id} [{cancelled.status.value}]")
-    _enqueue(queue, night_specs(), created_at=night)
+    _enqueue(queue, night_specs(), created_at=day, execute_at=night)
     pending = queue.pending_transactions()
     print(f"  queued (pending): {len(pending)}")
     print("  first 8 in priority order:", [tx.transaction_id for tx in pending[:8]])
     print("  last 5 in priority order:", [tx.transaction_id for tx in pending[-5:]])
+    print(
+        "  deferred until night:",
+        sum(1 for tx in pending if tx.execute_at == night),
+    )
 
     _section("3. Logging: execution, deviations, audit")
     clock.now = day
-    day_ids = {spec[0] for spec in daytime_specs() if spec[0] != "CXL1"}
-    day_results = []
-    night_results = []
-    while True:
-        nxt = queue.pop_next()
-        if nxt is None:
-            break
-        if nxt.transaction_id in day_ids:
-            clock.now = day
-            day_results.append(processor.process(nxt))
-        else:
-            clock.now = night
-            night_results.append(processor.process(nxt))
+    day_results = processor.process_all()
+    clock.now = night
+    night_results = processor.process_all()
     results = day_results + night_results
     print(f"  executed daytime: {len(day_results)}")
     print(f"  executed night: {len(night_results)}")
