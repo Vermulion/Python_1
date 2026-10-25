@@ -144,6 +144,74 @@ class TransactionTests(unittest.TestCase):
         )
         self.assertEqual(self.queue.pop_next().transaction_id, "HIGH")
 
+    def test_deferred_transactions_wait_for_execute_at(self) -> None:
+        later = datetime(2026, 6, 16, 2, 0)
+        due = self._tx(
+            sender_id="ALICE-RUB",
+            receiver_id="BOB-RUB",
+            amount=10,
+            transaction_id="DUE-NOW",
+            priority=1,
+            created_at=self.now,
+        )
+        deferred = self._tx(
+            sender_id="ALICE-RUB",
+            receiver_id="BOB-RUB",
+            amount=20,
+            transaction_id="DEFERRED",
+            priority=9,
+            created_at=self.now,
+            execute_at=later,
+        )
+        self.queue.add(due)
+        self.queue.add(deferred)
+        self.assertEqual(deferred.created_at, self.now)
+        self.assertEqual(deferred.execute_at, later)
+        self.assertFalse(deferred.is_due(self.now))
+        self.assertTrue(deferred.is_due(later))
+        self.assertEqual(
+            [tx.transaction_id for tx in self.queue.pending_transactions()],
+            ["DEFERRED", "DUE-NOW"],
+        )
+        self.assertEqual(self.queue.pop_next(at=self.now).transaction_id, "DUE-NOW")
+        self.assertIsNone(self.queue.pop_next(at=self.now))
+        self.assertEqual(self.queue.pop_next(at=later).transaction_id, "DEFERRED")
+        self.assertIsNone(self.queue.pop_next(at=later))
+
+    def test_process_all_skips_deferred_until_execute_at(self) -> None:
+        later = datetime(2026, 6, 16, 8, 0)
+        self.queue.add(
+            self._tx(
+                sender_id="ALICE-RUB",
+                receiver_id="BOB-RUB",
+                amount=10,
+                transaction_id="NOW-TX",
+                created_at=self.now,
+            )
+        )
+        self.queue.add(
+            self._tx(
+                sender_id="ALICE-RUB",
+                receiver_id="BOB-RUB",
+                amount=15,
+                transaction_id="LATER-TX",
+                created_at=self.now,
+                execute_at=later,
+            )
+        )
+        first = self.processor.process_all()
+        self.assertEqual([tx.transaction_id for tx in first], ["NOW-TX"])
+        self.assertEqual(first[0].status, TransactionStatus.COMPLETED)
+        self.assertEqual(
+            [tx.transaction_id for tx in self.queue.pending_transactions()],
+            ["LATER-TX"],
+        )
+        self.now = later
+        delayed = self.processor.process_all()
+        self.assertEqual([tx.transaction_id for tx in delayed], ["LATER-TX"])
+        self.assertEqual(delayed[0].status, TransactionStatus.COMPLETED)
+        self.assertEqual(self.queue.pending_transactions(), [])
+
     def test_internal_transfer_moves_money(self) -> None:
         tx = self._tx(
             sender_id="ALICE-RUB",
@@ -217,6 +285,94 @@ class TransactionTests(unittest.TestCase):
         self.assertEqual(tx.status, TransactionStatus.COMPLETED)
         self.assertEqual(tx.transfer_fee, 2.0)
         self.assertEqual(self.bank._require_account("ALICE-RUB").balance, 9_798)
+
+    def test_night_transfer_is_forbidden(self) -> None:
+        night = datetime(2026, 6, 16, 2, 0)
+        night_processor = TransactionProcessor(
+            self.bank,
+            TransactionQueue(),
+            outer_fee_rate=0.01,
+            clock=lambda: night,
+        )
+        tx = self._tx(
+            sender_id="ALICE-RUB",
+            receiver_id="BOB-RUB",
+            amount=20,
+            transaction_id="TX-NIGHT",
+            created_at=night,
+            execute_at=night,
+        )
+        night_processor.process(tx)
+        self.assertEqual(tx.status, TransactionStatus.REJECTED)
+        self.assertIn("00:00 until 05:00", tx.rejection_reason)
+        self.assertEqual(self.bank._require_account("ALICE-RUB").balance, 10_000)
+        self.assertEqual(self.bank._require_account("BOB-RUB").balance, 500)
+        self.assertIn("night_operation", self.alice.tags)
+
+    def test_premium_sender_applies_fixed_fee_and_transaction_limit(self) -> None:
+        self.bank.open_account(
+            "CL-ALICE",
+            "premium",
+            opening_balance=200,
+            account_id="ALICE-PREM",
+            transaction_limit=50,
+            overdraft_limit=20,
+            fixed_fee=5,
+        )
+        ok = self._tx(
+            sender_id="ALICE-PREM",
+            receiver_id="BOB-RUB",
+            amount=40,
+            transaction_id="TX-PREM-FEE",
+        )
+        self.processor.process(ok)
+        self.assertEqual(ok.status, TransactionStatus.COMPLETED)
+        self.assertEqual(self.bank._require_account("ALICE-PREM").balance, 155)
+        self.assertEqual(self.bank._require_account("BOB-RUB").balance, 540)
+
+        limited = self._tx(
+            sender_id="ALICE-PREM",
+            receiver_id="BOB-RUB",
+            amount=50.01,
+            transaction_id="TX-PREM-LIMIT",
+        )
+        self.processor.process(limited)
+        self.assertEqual(limited.status, TransactionStatus.REJECTED)
+        self.assertIn("transaction_limit", limited.rejection_reason)
+        self.assertEqual(self.bank._require_account("ALICE-PREM").balance, 155)
+        self.assertEqual(self.bank._require_account("BOB-RUB").balance, 540)
+
+    def test_failed_credit_restores_premium_sender_including_fee(self) -> None:
+        self.bank.open_account(
+            "CL-ALICE",
+            "premium",
+            opening_balance=500,
+            account_id="ALICE-SEND",
+            transaction_limit=80,
+            overdraft_limit=0,
+            fixed_fee=5,
+        )
+        self.bank.open_account(
+            "CL-BOB",
+            "premium",
+            opening_balance=10,
+            account_id="BOB-PREM",
+            transaction_limit=20,
+            fixed_fee=0,
+        )
+        sender = self.bank._require_account("ALICE-SEND")
+        receiver = self.bank._require_account("BOB-PREM")
+        tx = self._tx(
+            sender_id="ALICE-SEND",
+            receiver_id="BOB-PREM",
+            amount=50,
+            transaction_id="TX-PREM-ROLLBACK",
+        )
+        self.processor.process(tx)
+        self.assertEqual(tx.status, TransactionStatus.REJECTED)
+        self.assertIn("transaction_limit", tx.rejection_reason)
+        self.assertEqual(sender.balance, 500)
+        self.assertEqual(receiver.balance, 10)
 
     def test_retries_unexpected_errors_then_rejects(self) -> None:
         tx = self._tx(

@@ -351,7 +351,7 @@ class ReportBuilder:
         self, transaction: Transaction, owned: set[str] | None
     ) -> float:
         amount = self._amount_rub(transaction)
-        fee = round(float(transaction.transfer_fee) * self._rate(transaction), 2)
+        fee = self._fee_rub(transaction)
         if owned is None:
             if transaction.tx_type.value == "external":
                 return round(-(amount + fee), 2)
@@ -365,6 +365,18 @@ class ReportBuilder:
 
     def _amount_rub(self, transaction: Transaction) -> float:
         return round(float(transaction.amount) * self._rate(transaction), 2)
+
+    def _fee_rub(self, transaction: Transaction) -> float:
+        fee = float(transaction.transfer_fee)
+        if not fee:
+            return 0.0
+        return round(fee * self._fee_rate(transaction), 2)
+
+    def _fee_rate(self, transaction: Transaction) -> float:
+        sender = self.bank._accounts.get(transaction.sender_id)
+        if sender is not None:
+            return float(self.bank.rates_to_rub.get(sender.currency, 1.0))
+        return self._rate(transaction)
 
     def _rate(self, transaction: Transaction) -> float:
         return float(self.bank.rates_to_rub.get(transaction.currency, 1.0))

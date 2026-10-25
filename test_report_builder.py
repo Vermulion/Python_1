@@ -154,6 +154,33 @@ class ReportBuilderTests(unittest.TestCase):
         ]
         self.assertTrue(completed)
 
+    def test_external_fx_fee_is_converted_from_sender_currency(self) -> None:
+        opening = self.bank.get_total_balance()
+        tx = Transaction(
+            sender_id="ALICE-RUB",
+            receiver_id="SWIFT-USD",
+            amount=100,
+            currency="USD",
+            tx_type="external",
+            transaction_id="RPT-USD-FEE",
+            created_at=self.day,
+        )
+        self.processor.process(tx)
+        self.assertEqual(tx.status, TransactionStatus.COMPLETED)
+        self.assertAlmostEqual(tx.transfer_fee, 90.0)
+        builder = ReportBuilder(
+            self.bank,
+            self.processor,
+            transactions=[tx],
+            output_dir="reports",
+        )
+        self.assertAlmostEqual(builder._fee_rub(tx), 90.0)
+        self.assertAlmostEqual(builder._amount_rub(tx), 9_000.0)
+        series = builder.balance_series()
+        self.assertAlmostEqual(series[0][1], opening)
+        self.assertAlmostEqual(series[-1][1], self.bank.get_total_balance())
+        self.assertAlmostEqual(series[-1][1] - series[0][1], -(9_000.0 + 90.0))
+
 
 if __name__ == "__main__":
     unittest.main()

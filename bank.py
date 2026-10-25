@@ -236,8 +236,8 @@ class Bank:
         rub = float(amount) * self.rates_to_rub[source]
         return rub / self.rates_to_rub[target]
 
-    def _is_night(self) -> bool:
-        now = self._clock()
+    def _is_night(self, at: datetime | time | None = None) -> bool:
+        now = at if at is not None else self._clock()
         current = now.time() if isinstance(now, datetime) else now
         return NIGHT_START <= current < NIGHT_END
 
@@ -246,8 +246,9 @@ class Bank:
         operation: str,
         client_id: str | None = None,
         account_id: str | None = None,
+        at: datetime | time | None = None,
     ) -> None:
-        if not self._is_night():
+        if not self._is_night(at):
             return
         if client_id is None and account_id is not None:
             account = self._accounts.get(str(account_id).strip())

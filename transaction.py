@@ -84,6 +84,7 @@ class Transaction:
         transaction_id: str | None = None,
         priority: int = 0,
         created_at: datetime | None = None,
+        execute_at: datetime | None = None,
     ) -> None:
         self.transaction_id = self._create_unique_id(transaction_id)
         self.sender_id = str(sender_id).strip()
@@ -100,9 +101,14 @@ class Transaction:
         self.status = TransactionStatus.PENDING
         self.rejection_reason: str | None = None
         self.attempts = 0
+        if created_at is not None and not isinstance(created_at, datetime):
+            raise InvalidOperationError("created_at must be a datetime")
+        if execute_at is not None and not isinstance(execute_at, datetime):
+            raise InvalidOperationError("execute_at must be a datetime")
         now = created_at or datetime.now()
         self.created_at = now
         self.updated_at = now
+        self.execute_at = execute_at
         self.processed_at: datetime | None = None
 
     def mark(
@@ -121,6 +127,13 @@ class Transaction:
             TransactionStatus.CANCELLED,
         ):
             self.processed_at = self.updated_at
+
+    def is_due(self, at: datetime | None = None) -> bool:
+        """True when the transfer has no planned time or that time has arrived."""
+        if self.execute_at is None:
+            return True
+        moment = at or datetime.now()
+        return self.execute_at <= moment
 
     def __str__(self) -> str:
         fee = f" fee={self.transfer_fee:.2f}" if self.transfer_fee else ""
@@ -149,12 +162,16 @@ class Transaction:
 
 
 class TransactionQueue:
-    """Priority queue of pending transfers. Higher priority is processed first."""
+    """Priority queue of pending transfers. Higher priority is processed first.
 
-    def __init__(self) -> None:
+    Transfers with ``execute_at`` in the future stay queued until that time.
+    """
+
+    def __init__(self, clock: Callable[[], datetime] | None = None) -> None:
         self._heap: list[tuple[int, int, str]] = []
         self._items: dict[str, Transaction] = {}
         self._seq = 0
+        self._clock = clock or datetime.now
 
     def add(self, transaction: Transaction, priority: int | None = None) -> Transaction:
         if not isinstance(transaction, Transaction):
@@ -199,15 +216,26 @@ class TransactionQueue:
         )
         return transaction
 
-    def pop_next(self) -> Transaction | None:
+    def pop_next(self, at: datetime | None = None) -> Transaction | None:
+        now = at or self._clock()
+        deferred: list[tuple[int, int, str]] = []
+        selected: Transaction | None = None
         while self._heap:
-            _, _, tx_id = heapq.heappop(self._heap)
+            item = heapq.heappop(self._heap)
+            _, _, tx_id = item
             transaction = self._items.get(tx_id)
             if transaction is None:
                 continue
-            if transaction.status is TransactionStatus.PENDING:
-                return transaction
-        return None
+            if transaction.status is not TransactionStatus.PENDING:
+                continue
+            if not transaction.is_due(now):
+                deferred.append(item)
+                continue
+            selected = transaction
+            break
+        for item in deferred:
+            heapq.heappush(self._heap, item)
+        return selected
 
     def get(self, transaction_id: str) -> Transaction | None:
         return self._items.get(str(transaction_id).strip())
@@ -239,10 +267,10 @@ class TransactionProcessor:
         if max_retries < 1:
             raise InvalidOperationError("max_retries must be at least 1")
         self.bank = bank
-        self.queue = queue if queue is not None else TransactionQueue()
         self.outer_fee_rate = float(outer_fee_rate)
         self.max_retries = int(max_retries)
         self._clock = clock or datetime.now
+        self.queue = queue if queue is not None else TransactionQueue(clock=self._clock)
         self.error_log: list[dict[str, object]] = []
         self.audit_log = audit_log if audit_log is not None else AuditLog(clock=self._clock)
         self.risk_analyzer = (
@@ -253,7 +281,7 @@ class TransactionProcessor:
     def process_all(self) -> list[Transaction]:
         results: list[Transaction] = []
         while True:
-            transaction = self.queue.pop_next()
+            transaction = self.queue.pop_next(at=self._clock())
             if transaction is None:
                 break
             results.append(self.process(transaction))
@@ -272,6 +300,7 @@ class TransactionProcessor:
             transaction.mark(TransactionStatus.PROCESSING, at=self._clock())
             try:
                 self._screen(transaction)
+                self._forbid_night_transfer(transaction)
                 self._apply(transaction)
                 self.risk_analyzer.remember(transaction)
                 transaction.mark(TransactionStatus.COMPLETED, at=self._clock())
@@ -329,6 +358,12 @@ class TransactionProcessor:
                 f"{assessment.level.value} risk ({', '.join(assessment.signals)})"
             )
 
+    def _forbid_night_transfer(self, transaction: Transaction) -> None:
+        self.bank._forbid_night_operations(
+            "transfer",
+            account_id=transaction.sender_id,
+            at=self._clock(),
+        )
 
     def _apply(self, transaction: Transaction) -> None:
         sender = self._require_account(transaction.sender_id, "sender")
@@ -365,12 +400,13 @@ class TransactionProcessor:
                 transaction.amount, transaction.currency, receiver.currency
             )
 
+        sender_balance_before = sender.balance
         self._debit(sender, total_debit)
         if receiver is not None:
             try:
                 self._credit(receiver, credit)
             except Exception:
-                self._credit(sender, total_debit)
+                self._restore_balance(sender, sender_balance_before)
                 raise
 
     def _forbid_frozen(self, account: BankAccount, direction: str) -> None:
@@ -380,7 +416,10 @@ class TransactionProcessor:
             )
 
     def _forbid_negative_balance(self, account: BankAccount, debit: float) -> None:
-        projected = round(account.balance - debit, 2)
+        charged = debit
+        if isinstance(account, PremiumAccount):
+            charged = round(debit + account.fixed_fee, 2)
+        projected = round(account.balance - charged, 2)
         if isinstance(account, SavingsAccount) and projected < account.min_balance:
             raise InsufficientFundsError(
                 f"need {debit}, but balance {account.balance} cannot go below "
@@ -389,7 +428,7 @@ class TransactionProcessor:
         if isinstance(account, PremiumAccount):
             if projected < -account.overdraft_limit:
                 raise InsufficientFundsError(
-                    f"need {debit}, but overdraft_limit is {account.overdraft_limit}"
+                    f"need {charged}, but overdraft_limit is {account.overdraft_limit}"
                 )
             return
         if projected < 0:
@@ -398,12 +437,14 @@ class TransactionProcessor:
             )
 
     def _debit(self, account: BankAccount, amount: float) -> None:
-        account._check_account_status("transfer")
-        money = account._protect_from_negative(amount, allow_zero=False)
-        account._balance = round(account.balance - money, 2)
+        account.withdraw(amount)
 
     def _credit(self, account: BankAccount, amount: float) -> None:
         account.deposit(amount)
+
+    def _restore_balance(self, account: BankAccount, previous: float) -> None:
+        """Put the sender back exactly as before the debit, bypassing deposit limits."""
+        account._balance = round(float(previous), 2)
 
     def _convert(self, amount: float, source: Currency, target: Currency) -> float:
         if source is target:
